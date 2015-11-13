@@ -25,7 +25,7 @@ build() {
         mkdir lib
     fi
 
-    build_src_dir=$(pwd)
+    build_src_dir="."
     build_make_type="Eclipse CDT4 - Unix Makefiles"
     build_make_ver="4.2"
     build_type=$1
