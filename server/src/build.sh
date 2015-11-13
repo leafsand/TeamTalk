@@ -1,5 +1,14 @@
 #!/bin/bash
 
+build_eclipse_project()
+{
+ build_src_dir=$(pwd)
+ build_make_type="Eclipse CDT4 - Unix Makefiles"
+ build_make_ver="4.2"
+ 
+ cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
+}
+
 build() {
     yum -y install cmake
     yum -y install libuuid-devel
@@ -16,8 +25,13 @@ build() {
         mkdir lib
     fi
 
-	cd base
-    cmake .
+    build_src_dir=$(pwd)
+    build_make_type="Eclipse CDT4 - Unix Makefiles"
+    build_make_ver="4.2"
+    build_type=$1
+
+    cd base
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
 	make
     if [ $? -eq 0 ]; then
         echo "make base successed";
@@ -30,7 +44,7 @@ build() {
         cp libbase.a ../lib/
     fi
     cd ../slog
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
     make
     if [ $? -eq 0 ]; then
         echo "make slog successed";
@@ -44,7 +58,7 @@ build() {
     cp -a lib/liblog4cxx* ../base/slog/lib/
 
     cd ../login_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
 	make
     if [ $? -eq 0 ]; then
         echo "make login_server successed";
@@ -54,7 +68,7 @@ build() {
     fi
 
 	cd ../route_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
 	make
     if [ $? -eq 0 ]; then
         echo "make route_server successed";
@@ -64,7 +78,7 @@ build() {
     fi
 
 	cd ../msg_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
 	make
     if [ $? -eq 0 ]; then
         echo "make msg_server successed";
@@ -74,7 +88,7 @@ build() {
     fi
 
     cd ../http_msg_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
     make
     if [ $? -eq 0 ]; then
         echo "make http_msg_server successed";
@@ -84,7 +98,7 @@ build() {
     fi
 
     cd ../file_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
     make
     if [ $? -eq 0 ]; then
         echo "make file_server successed";
@@ -94,7 +108,7 @@ build() {
     fi
 
     cd ../push_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
     make
     if [ $? -eq 0 ]; then
         echo "make push_server successed";
@@ -113,7 +127,7 @@ build() {
     fi
 
     cd ../db_proxy_server
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
     make
     if [ $? -eq 0 ]; then
         echo "make db_proxy_server successed";
@@ -123,7 +137,7 @@ build() {
     fi
 
     cd ../msfs
-    cmake .
+    cmake -G "${build_make_type}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D CMAKE_BUILD_TYPE=${build_type} -D_ECLIPSE_VERSION=${build_make_ver} ${build_src_dir}
     make
     if [ $? -eq 0 ]; then
         echo "make msfs successed";
@@ -226,40 +240,41 @@ clean() {
 	cd ../msg_server
 	make clean
 	cd ../http_msg_server
-    make clean
+        make clean
 	cd ../file_server
-    make clean
-    cd ../push_server
-    make clean
+        make clean
+        cd ../push_server
+        make clean
 	cd ../db_proxy_server
 	make clean
-    cd ../push_server
-    make clean
+        cd ../push_server
+        make clean
 }
 
 print_help() {
 	echo "Usage: "
 	echo "  $0 clean --- clean all build"
-	echo "  $0 version version_str --- build a version"
+	echo "  $0 debug --- build a debug version"
+	echo "  $0 release --- build a release version"
 }
+
 
 case $1 in
 	clean)
-		echo "clean all build..."
+	 	echo "clean all build..."
 		clean
 		;;
-	version)
-		if [ $# != 2 ]; then 
-			echo $#
-			print_help
-			exit
-		fi
-
-		echo $2
+	debug)
 		echo "build..."
-		build $2
+		build "DEBUG"
+		;;
+	release)
+		echo "build..."
+		build "RELEASE"
 		;;
 	*)
 		print_help
 		;;
 esac
+
+
